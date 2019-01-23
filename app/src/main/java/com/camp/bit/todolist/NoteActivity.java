@@ -1,5 +1,7 @@
 package com.camp.bit.todolist;
 
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,22 +11,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Interpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-
+import com.camp.bit.todolist.beans.Priority;
 import com.camp.bit.todolist.db.TodoContract;
 import com.camp.bit.todolist.db.TodoDbHelper;
 
 
-public class NoteActivity extends AppCompatActivity {
+public class NoteActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText editText;
     private Button addBtn;
+    private ImageView[] prioritieViews;
     SQLiteDatabase database;
     TodoDbHelper todoDbHelper;
 
@@ -41,6 +45,15 @@ public class NoteActivity extends AppCompatActivity {
         editText = findViewById(R.id.edit_text);
         editText.setFocusable(true);
         editText.requestFocus();
+        prioritieViews = new ImageView[3];
+        prioritieViews[0] = findViewById(R.id.iv_high_priority);
+        prioritieViews[1] = findViewById(R.id.iv_medium_priority);
+        prioritieViews[2] = findViewById(R.id.iv_low_priority);
+        selectPriority(R.id.iv_medium_priority);
+        for (ImageView imageView : prioritieViews) {
+            imageView.setOnClickListener(this);
+        }
+
         InputMethodManager inputManager = (InputMethodManager)
                 getSystemService(Context.INPUT_METHOD_SERVICE);
         if (inputManager != null) {
@@ -85,6 +98,7 @@ public class NoteActivity extends AppCompatActivity {
             values.put(TodoContract.FeedEntry.COLUMN_NAME_CONTENT,content);
             values.put(TodoContract.FeedEntry.COLUMN_NAME_DATE,(System.currentTimeMillis()));
             values.put(TodoContract.FeedEntry.COLUMN_NAME_STATE,0);
+            values.put(TodoContract.FeedEntry.COLUMN_NAME_PRIORITY, selectedPriority);
             long newRowId = database.insert(TodoContract.FeedEntry.TABLE_NAME,null,values);
             Log.i(NoteActivity.class.getSimpleName(), "row id" + newRowId);
         }catch (Exception e){
@@ -92,5 +106,45 @@ public class NoteActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    private void selectPriority(int selectViewId) {
+        PropertyValuesHolder zoomInX = PropertyValuesHolder.ofFloat(View.SCALE_X, .6f, 1f);
+        PropertyValuesHolder zoomInY = PropertyValuesHolder.ofFloat(View.SCALE_Y, .6f, 1f);
+        PropertyValuesHolder zoomOutX = PropertyValuesHolder.ofFloat(View.SCALE_X, 1f, .6f);
+        PropertyValuesHolder zoomOutY = PropertyValuesHolder.ofFloat(View.SCALE_Y, 1f, .6f);
+
+
+        for (View view : prioritieViews) {
+            if (view.getId() == selectViewId) {
+                // zoomOut
+                ObjectAnimator zoomInAniamtor = ObjectAnimator.ofPropertyValuesHolder(view, zoomOutX, zoomOutY);
+                zoomInAniamtor.setInterpolator(new AccelerateDecelerateInterpolator());
+                zoomInAniamtor.start();
+            } else if (view.getScaleX() < 0.7f) {
+                // zoomIn
+                ObjectAnimator zoomInAniamtor = ObjectAnimator.ofPropertyValuesHolder(view, zoomInX, zoomInY);
+                zoomInAniamtor.setInterpolator(new AccelerateDecelerateInterpolator());
+                zoomInAniamtor.start();
+            }
+        }
+    }
+
+    private int selectedPriority = Priority.MEDIUM.intValue;
+
+    @Override
+    public void onClick(View view) {
+        selectPriority(view.getId());
+        switch (view.getId()) {
+            case R.id.iv_high_priority:
+                selectedPriority = Priority.HIGH.intValue;
+                break;
+            case R.id.iv_medium_priority:
+                selectedPriority = Priority.MEDIUM.intValue;
+                break;
+            case R.id.iv_low_priority:
+                selectedPriority = Priority.LOW.intValue;
+                break;
+        }
     }
 }

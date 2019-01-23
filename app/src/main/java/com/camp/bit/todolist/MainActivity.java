@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.camp.bit.todolist.beans.Note;
+import com.camp.bit.todolist.beans.Priority;
 import com.camp.bit.todolist.beans.State;
 import com.camp.bit.todolist.db.TodoContract;
 import com.camp.bit.todolist.db.TodoDbHelper;
@@ -129,12 +130,13 @@ public class MainActivity extends AppCompatActivity {
                 BaseColumns._ID,
                 TodoContract.FeedEntry.COLUMN_NAME_DATE,
                 TodoContract.FeedEntry.COLUMN_NAME_STATE,
-                TodoContract.FeedEntry.COLUMN_NAME_CONTENT
+                TodoContract.FeedEntry.COLUMN_NAME_CONTENT,
+                TodoContract.FeedEntry.COLUMN_NAME_PRIORITY
         };
 
         String selection = TodoContract.FeedEntry._ID + " = ?";
         String[] selectionArgs = {"*"};
-        String sortOrder = TodoContract.FeedEntry._ID + " DESC";
+        String sortOrder = TodoContract.FeedEntry.COLUMN_NAME_PRIORITY + " DESC";
         Cursor cursor = null;
         try {
              cursor = database.query(TodoContract.FeedEntry.TABLE_NAME,
@@ -151,11 +153,14 @@ public class MainActivity extends AppCompatActivity {
                 long dateMs = cursor.getLong(cursor.getColumnIndex(TodoContract.FeedEntry.COLUMN_NAME_DATE));
                 int intState = cursor.getInt(cursor.getColumnIndex(TodoContract.FeedEntry.COLUMN_NAME_STATE));
                 int ID = cursor.getInt(cursor.getColumnIndex(TodoContract.FeedEntry._ID));
+                int priority = cursor.getInt(cursor.getColumnIndex(TodoContract.FeedEntry.COLUMN_NAME_PRIORITY));
 
                 Note note = new Note(ID);
                 note.setContent(content);
                 note.setDate(new Date(dateMs));
                 note.setState(State.from(intState));
+                note.setPriorityLevel(priority);
+                Log.i(MainActivity.class.getSimpleName(), "content : " + note.getContent() + " priority: " + note.getPriorityLevel());
                 result.add(note);
             }
         }finally {
@@ -166,7 +171,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void deleteNote(Note note) {
-        // TODO 删除数据
         String selection = TodoContract.FeedEntry._ID + " = ?";
         String[] selectionArgs = { String.valueOf(note.id) };
         int deletedRows = database.delete(TodoContract.FeedEntry.TABLE_NAME,selection,selectionArgs);

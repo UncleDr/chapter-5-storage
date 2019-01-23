@@ -15,4 +15,6 @@
     <!-- Note -->
     <string name="take_a_note">Take a note</string>
     <string name="confirm">Confirm</string>
+    <string name="priority">Priority</string>
+    <string name="content">Content</string>
 </resources>

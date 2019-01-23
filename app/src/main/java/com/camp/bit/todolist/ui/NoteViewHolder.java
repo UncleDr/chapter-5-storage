@@ -1,17 +1,21 @@
 package com.camp.bit.todolist.ui;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.ImageViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.camp.bit.todolist.NoteOperator;
 import com.camp.bit.todolist.R;
 import com.camp.bit.todolist.beans.Note;
+import com.camp.bit.todolist.beans.Priority;
 import com.camp.bit.todolist.beans.State;
 
 import java.text.SimpleDateFormat;
@@ -33,6 +37,7 @@ public class NoteViewHolder extends RecyclerView.ViewHolder {
     private TextView contentText;
     private TextView dateText;
     private View deleteBtn;
+    private ImageView priorityImage;
 
     public NoteViewHolder(@NonNull View itemView, NoteOperator operator) {
         super(itemView);
@@ -42,6 +47,7 @@ public class NoteViewHolder extends RecyclerView.ViewHolder {
         contentText = itemView.findViewById(R.id.text_content);
         dateText = itemView.findViewById(R.id.text_date);
         deleteBtn = itemView.findViewById(R.id.btn_delete);
+        priorityImage = itemView.findViewById(R.id.iv_note_priority);
     }
 
     public void bind(final Note note) {
@@ -70,6 +76,16 @@ public class NoteViewHolder extends RecyclerView.ViewHolder {
         } else {
             contentText.setTextColor(Color.BLACK);
             contentText.setPaintFlags(contentText.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+        }
+
+        if (note.getPriorityLevel() == Priority.HIGH.intValue) {
+            priorityImage.setBackgroundColor(priorityImage.getContext().getResources().getColor(R.color.high_priority));
+
+        } else if (note.getPriorityLevel() == Priority.MEDIUM.intValue) {
+            priorityImage.setBackgroundColor(priorityImage.getContext().getResources().getColor(R.color.medium_priority));
+
+        } else {
+            priorityImage.setBackgroundColor(priorityImage.getContext().getResources().getColor(R.color.low_priority));
         }
     }
 }

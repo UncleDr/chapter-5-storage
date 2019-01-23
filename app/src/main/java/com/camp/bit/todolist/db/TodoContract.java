@@ -19,6 +19,7 @@ public final class TodoContract {
         public static final String COLUMN_NAME_DATE = "date";
         public static final String COLUMN_NAME_STATE = "state";
         public static final String COLUMN_NAME_CONTENT = "content";
+        public static final String COLUMN_NAME_PRIORITY = "priority";
     }
 
     public static final String SQL_CREATE_ENTRIES =

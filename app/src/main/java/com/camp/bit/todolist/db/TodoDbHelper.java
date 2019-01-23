@@ -15,11 +15,11 @@ import static com.camp.bit.todolist.db.TodoContract.SQL_DELETE_ENTRIES;
 public class TodoDbHelper extends SQLiteOpenHelper {
 
     // TODO 定义数据库名、版本；创建数据库
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "TodoContract.db";
 
     public TodoDbHelper(Context context) {
-        super(context, "todo", null, 1);
+        super(context, "todo", null, DATABASE_VERSION);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class TodoDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        String EXTRA = "priorityLevel";
+        String EXTRA = "priority";
         for(int i = oldVersion; i < newVersion;  i++) {
             switch (i) {
                 case 1:
