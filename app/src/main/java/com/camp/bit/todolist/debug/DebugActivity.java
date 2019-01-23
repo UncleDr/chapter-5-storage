@@ -14,7 +14,11 @@ import android.widget.Toast;
 
 import com.camp.bit.todolist.R;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -65,7 +69,44 @@ public class DebugActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // TODO 把一段文本写入某个存储区的文件中，再读出来，显示在 fileText 上
-                fileText.setText("TODO");
+                FileReader fileReader = null;
+                FileWriter fileWriter = null;
+
+                BufferedReader bufferedReader = null;
+                BufferedWriter bufferedWriter = null;
+
+                String text = "", tmp = "";
+                try{
+                    File myFile = new File(Environment.getExternalStorageDirectory().toString() + File.separator +
+                    "myfile");
+                    myFile.createNewFile();
+
+                    fileReader = new FileReader(myFile);
+                    fileWriter = new FileWriter(myFile);
+                    bufferedReader = new BufferedReader(fileReader);
+                    bufferedWriter = new BufferedWriter(fileWriter);
+
+                    bufferedWriter.write("This is a new text\n");
+                    bufferedWriter.close();
+
+                    while((tmp = bufferedReader.readLine()) != null) {
+                        text += tmp;
+                    }
+                    if(!text.equals(""))
+                        fileText.setText(text);
+                    else
+                        fileText.setText("Empty\n");
+
+                }catch (Exception e){
+                    e.printStackTrace();
+                }finally {
+                    try{
+                        if(bufferedReader != null)
+                            bufferedReader.close();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
             }
         });
     }

@@ -1,26 +1,42 @@
 package com.camp.bit.todolist;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+
+import com.camp.bit.todolist.db.TodoContract;
+import com.camp.bit.todolist.db.TodoDbHelper;
+
+
 public class NoteActivity extends AppCompatActivity {
 
     private EditText editText;
     private Button addBtn;
+    SQLiteDatabase database;
+    TodoDbHelper todoDbHelper;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note);
         setTitle(R.string.take_a_note);
+
+        todoDbHelper = new TodoDbHelper(this);
+        database = todoDbHelper.getWritableDatabase();
 
         editText = findViewById(R.id.edit_text);
         editText.setFocusable(true);
@@ -63,6 +79,18 @@ public class NoteActivity extends AppCompatActivity {
 
     private boolean saveNote2Database(String content) {
         // TODO 插入一条新数据，返回是否插入成功
-        return false;
+
+        try{
+            ContentValues values = new ContentValues();
+            values.put(TodoContract.FeedEntry.COLUMN_NAME_CONTENT,content);
+            values.put(TodoContract.FeedEntry.COLUMN_NAME_DATE,(System.currentTimeMillis()));
+            values.put(TodoContract.FeedEntry.COLUMN_NAME_STATE,0);
+            long newRowId = database.insert(TodoContract.FeedEntry.TABLE_NAME,null,values);
+            Log.i(NoteActivity.class.getSimpleName(), "row id" + newRowId);
+        }catch (Exception e){
+            return false;
+        }
+
+        return true;
     }
 }
